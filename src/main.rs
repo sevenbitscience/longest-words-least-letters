@@ -8,14 +8,25 @@ fn filename_to_string(s: &str) -> io::Result<String> {
     Ok(s)
 }
 
-fn get_unique_letters(w: &str) -> i32 {
-    let mut letters: [bool; 26] = [false; 26];
-    for l in w.chars() {
-        let val = (l.to_digit(36).unwrap() - 10) as usize;
-        letters[val] = true;
-        // println!("{:?}", val);
+fn bitcount(mut n: u32) -> u32 {
+    let mut count: u32 = 0;
+    while n > 0 {
+        count = count+1;
+        n = n & (n-1);
     }
-    letters.iter().filter(|v| **v == true).count() as i32
+    return count;
+}
+
+fn to_bits(word: &str) -> u32 {
+    let mut r = 0;
+    for c in word.chars() {
+        r |= 1 << (c.to_digit(36).unwrap()-10);
+    }
+    return r;
+}
+
+fn get_unique_letters(w: &str) -> u32 {
+    bitcount(to_bits(w))
 }
 
 fn main() {
@@ -30,7 +41,7 @@ fn main() {
     let mut scores: Vec<f32> = vec![];
 
     let mut out = File::create("words.txt").expect("Couldn't create output file");
-    let cool_words_score: f32 = 3.0;
+    let cool_words_score: f32 = 2.5;
     out.write_fmt(format_args!("Saving words that score at least {}...\n", cool_words_score)).expect("Couldn't write to output file");
 
     let mut best_word = 0;
@@ -57,16 +68,4 @@ fn main() {
     }
 
     println!("Done! The best word overall was {}. The best REAL word was {}, {:?} letters long, {:?} unique letters, giving a score of {:?}!", words[best_word], words[best_fair_word], words[best_fair_word].len(), get_unique_letters(words[best_fair_word]), scores[best_fair_word]);
-
-    // for word in best_wordse {
-    //     for i in 0..word.len() {
-    //         for l in 0..word_len {
-    //             // print!("{}", word[i] as char);
-    //             out.write_fmt(format_args!("{}", trimmed_words[word[i]][l] as char)).expect("Couldn't write to output file");
-    //         }
-    //         out.write_all(b" ").expect("Couldn't write to output file");
-    //     }
-    //     // println!("")
-    //     out.write_all(b"\n").expect("Couldn't write to output file");
-    // }
 }
